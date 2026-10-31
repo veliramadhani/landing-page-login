@@ -1,0 +1,1023 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Microservices Lab • Platform Praktikum Arsitektur Terdistribusi</title>
+  <!-- Google Fonts: Plus Jakarta Sans (Profesional Bersih) & Fredoka (Cute & Bulat) -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Fredoka:wght@600;700&family=Plus+Jakarta+Sans:wght@400;500;600;700&family=JetBrains+Mono:wght@500;600&display=swap" rel="stylesheet">
+
+  <style>
+    /* ================= PALET WARNA: DEEP RASPBERRY ROSE (#8A1F4B) & PASTEL KUNING ================= */
+    :root {
+      --bg-base: #FAF8F5;
+      
+      --pastel-pink-soft: #FDF2F6;
+      --pastel-pink-border: #F3CAD8;
+      --pastel-pink: #E8A7BE;
+      --pastel-pink-accent: #8A1F4B;     /* Deep Raspberry / Velvet Rose #8A1F4B */
+      --pastel-pink-deep: #70163C;       /* Deep Shade untuk Hover */
+
+      --pastel-yellow-soft: #FFFCE8;
+      --pastel-yellow: #FFE894;
+      --pastel-yellow-accent: #E5AD24;
+
+      --pastel-mint-soft: #EDFAF6;
+      --pastel-mint: #93DECB;
+
+      --text-title: #2B1E23;
+      --text-body: #55454B;
+      --text-muted: #88747C;
+
+      --border-soft: #F0DFE4;
+      --card-white: #FFFFFF;
+      --shadow-clean: 0 10px 30px rgba(138, 31, 75, 0.12);
+
+      --radius-sm: 12px;
+      --radius-md: 18px;
+      --radius-lg: 28px;
+      --radius-pill: 50px;
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    html, body {
+      min-height: 100vh;
+      background-color: var(--bg-base);
+      /* Latar Belakang Gradien Halus Pastel Pink & Kuning dengan Dot Grid Elegan */
+      background-image: 
+        radial-gradient(at 10% 15%, #FFEBF1 0px, transparent 40%),
+        radial-gradient(at 90% 15%, #FFF7DC 0px, transparent 40%),
+        radial-gradient(at 50% 90%, #FFF2F6 0px, transparent 45%),
+        radial-gradient(#E8D5DC 1px, transparent 1px);
+      background-size: 100% 100%, 100% 100%, 100% 100%, 32px 32px;
+      color: var(--text-body);
+      font-family: 'Plus Jakarta Sans', sans-serif;
+      overflow-x: hidden;
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+    }
+
+    h1, h2, h3, .font-cute {
+      color: var(--text-title);
+      font-family: 'Fredoka', cursive, sans-serif;
+      font-weight: 700;
+    }
+
+    /* ================= NAVBAR (BERSIH & MINIMALIS) ================= */
+    .header-nav {
+      width: 100%;
+      padding: 20px 55px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      border-bottom: 1.5px solid rgba(240, 223, 228, 0.7);
+      background: rgba(255, 255, 255, 0.85);
+      backdrop-filter: blur(12px);
+      z-index: 50;
+    }
+
+    .brand {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      text-decoration: none;
+    }
+
+    .brand-icon {
+      width: 38px;
+      height: 38px;
+      background: linear-gradient(135deg, #A32C5D, #FFE28A);
+      border-radius: 12px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 1.2rem;
+      box-shadow: 0 4px 10px rgba(138, 31, 75, 0.35);
+    }
+
+    .brand-text {
+      font-size: 1.32rem;
+      font-weight: 700;
+      color: var(--text-title);
+      font-family: 'Fredoka', sans-serif;
+      letter-spacing: -0.2px;
+    }
+
+    .brand-badge {
+      font-size: 0.7rem;
+      font-family: 'Plus Jakarta Sans', sans-serif;
+      font-weight: 700;
+      background: var(--pastel-yellow);
+      color: #6E4D00;
+      padding: 3px 9px;
+      border-radius: 20px;
+      margin-left: 6px;
+      letter-spacing: 0.5px;
+    }
+
+    .nav-actions {
+      display: flex;
+      align-items: center;
+      gap: 14px;
+    }
+
+    .btn-clean {
+      border: none;
+      outline: none;
+      cursor: pointer;
+      font-family: 'Plus Jakarta Sans', sans-serif;
+      font-weight: 600;
+      font-size: 0.95rem;
+      padding: 10px 24px;
+      border-radius: var(--radius-pill);
+      transition: all 0.2s ease;
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+    }
+
+    .btn-login-nav {
+      background: transparent;
+      color: var(--text-title);
+    }
+
+    .btn-login-nav:hover {
+      background: rgba(253, 242, 246, 0.85);
+      color: var(--pastel-pink-accent);
+    }
+
+    .btn-register-nav {
+      background: linear-gradient(135deg, #A12B5B, #8A1F4B);
+      color: white;
+      box-shadow: 0 4px 14px rgba(138, 31, 75, 0.35);
+    }
+
+    .btn-register-nav:hover {
+      background: linear-gradient(135deg, #8A1F4B, #70163C);
+      transform: translateY(-1px);
+    }
+
+    /* ================= MAIN HERO (TERPUSAT, LUAS, & PROPORSIONAL) ================= */
+    .hero-wrapper {
+      flex: 1;
+      width: 90%;
+      max-width: 960px;
+      margin: 0 auto;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      text-align: center;
+      padding: 50px 0 40px 0;
+    }
+
+    .tag-pill {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      background: var(--pastel-yellow-soft);
+      border: 1.5px solid #F5DB88;
+      color: #6E4E02;
+      padding: 7px 20px;
+      border-radius: var(--radius-pill);
+      font-size: 0.85rem;
+      font-weight: 700;
+      margin-bottom: 24px;
+      letter-spacing: 0.4px;
+    }
+
+    .tag-pill .badge-dot {
+      width: 8px;
+      height: 8px;
+      background: #DDA312;
+      border-radius: 50%;
+    }
+
+    .hero-title {
+      font-size: 3.6rem;
+      line-height: 1.2;
+      letter-spacing: -0.8px;
+      margin-bottom: 22px;
+      color: var(--text-title);
+      max-width: 840px;
+    }
+
+    .hero-title span.accent-pink {
+      color: var(--pastel-pink-accent);
+    }
+
+    .hero-title span.accent-yellow-box {
+      background: linear-gradient(120deg, transparent 65%, #FFE894 65%);
+      display: inline-block;
+    }
+
+    .hero-description {
+      font-size: 1.15rem;
+      color: var(--text-body);
+      line-height: 1.75;
+      margin-bottom: 34px;
+      max-width: 660px;
+    }
+
+    .hero-buttons {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 18px;
+      flex-wrap: wrap;
+      margin-bottom: 50px;
+    }
+
+    .btn-primary-hero {
+      background: linear-gradient(135deg, #A12B5B, #8A1F4B);
+      color: white;
+      padding: 14px 34px;
+      font-size: 1.05rem;
+      border-radius: var(--radius-pill);
+      border: none;
+      font-weight: 700;
+      cursor: pointer;
+      box-shadow: 0 8px 24px rgba(138, 31, 75, 0.38);
+      transition: all 0.2s ease;
+      display: inline-flex;
+      align-items: center;
+      gap: 10px;
+    }
+
+    .btn-primary-hero:hover {
+      background: linear-gradient(135deg, #8A1F4B, #70163C);
+      transform: translateY(-2px);
+      box-shadow: 0 10px 28px rgba(138, 31, 75, 0.48);
+    }
+
+    .btn-secondary-hero {
+      background: white;
+      color: var(--text-title);
+      border: 1.5px solid var(--border-soft);
+      padding: 14px 32px;
+      font-size: 1.05rem;
+      border-radius: var(--radius-pill);
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.2s ease;
+      display: inline-flex;
+      align-items: center;
+      gap: 10px;
+    }
+
+    .btn-secondary-hero:hover {
+      background: #FFFDF8;
+      border-color: var(--pastel-yellow-accent);
+      color: #6E4E02;
+    }
+
+    /* 3 Kartu Fitur Ringkas & Rapi */
+    .features-strip {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 20px;
+      width: 100%;
+      max-width: 860px;
+    }
+
+    .feature-item-card {
+      background: rgba(255, 255, 255, 0.9);
+      border: 1.5px solid var(--border-soft);
+      border-radius: var(--radius-md);
+      padding: 18px 20px;
+      text-align: left;
+      display: flex;
+      align-items: center;
+      gap: 15px;
+      box-shadow: var(--shadow-clean);
+      transition: transform 0.2s ease, border-color 0.2s ease;
+    }
+
+    .feature-item-card:hover {
+      transform: translateY(-2px);
+      border-color: var(--pastel-pink);
+    }
+
+    .feature-icon-box {
+      width: 44px;
+      height: 44px;
+      border-radius: 12px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 1.35rem;
+      flex-shrink: 0;
+    }
+
+    .icon-pink { background: #FDF2F6; border: 1.5px solid #F3CAD8; }
+    .icon-yellow { background: #FFFCE8; border: 1.5px solid #FCE48A; }
+    .icon-mint { background: #EDFAF6; border: 1.5px solid #BFEADA; }
+
+    .feature-text-group h3 {
+      font-size: 0.96rem;
+      font-weight: 700;
+      color: var(--text-title);
+      margin-bottom: 2px;
+    }
+
+    .feature-text-group p {
+      font-size: 0.82rem;
+      color: var(--text-muted);
+      line-height: 1.4;
+    }
+
+    /* ================= MODAL SPLIT CARD: DEEP RASPBERRY ROSE (#8A1F4B) ================= */
+    .modal-backdrop {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100vw;
+      height: 100vh;
+      background: rgba(45, 18, 28, 0.55);
+      backdrop-filter: blur(8px);
+      z-index: 1000;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 20px;
+      opacity: 0;
+      visibility: hidden;
+      transition: opacity 0.25s ease, visibility 0.25s ease;
+    }
+
+    .modal-backdrop.active {
+      opacity: 1;
+      visibility: visible;
+    }
+
+    /* Box 2 Kolom dengan Sudut Bulat Halus */
+    .modal-split-box {
+      background: #FFFFFF;
+      width: 100%;
+      max-width: 860px;
+      border-radius: var(--radius-lg);
+      box-shadow: 0 25px 60px rgba(138, 31, 75, 0.32);
+      border: 2px solid #F3CAD8;
+      display: flex;
+      overflow: hidden;
+      position: relative;
+    }
+
+    /* Tombol Tutup Silang Imut */
+    .modal-close-cross {
+      position: absolute;
+      top: 18px;
+      right: 20px;
+      background: #FDF2F6;
+      border: 1.5px solid #F3CAD8;
+      color: var(--pastel-pink-accent);
+      width: 34px;
+      height: 34px;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 1.1rem;
+      cursor: pointer;
+      z-index: 10;
+      transition: all 0.2s ease;
+      font-weight: 700;
+    }
+
+    .modal-close-cross:hover {
+      background: var(--pastel-pink-accent);
+      color: white;
+      transform: rotate(90deg);
+    }
+
+    /* SISI KIRI MODAL: DEEP RASPBERRY ROSE (#8A1F4B) */
+    .modal-banner-left {
+      flex: 1;
+      /* Menggunakan Deep Raspberry Rose #8A1F4B Sesuai Pilihan */
+      background: linear-gradient(140deg, #9E2B5A 0%, #8A1F4B 50%, #72153C 100%);
+      padding: 40px 36px;
+      color: #FFFFFF;
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+      position: relative;
+    }
+
+    .banner-top-brand {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      font-size: 1rem;
+      font-weight: 700;
+      color: #FFFDE6;
+      margin-bottom: 22px;
+      font-family: 'Fredoka', cursive;
+    }
+
+    .banner-brand-icon {
+      background: rgba(255, 255, 255, 0.28);
+      padding: 4px 10px;
+      border-radius: 12px;
+      font-size: 1rem;
+    }
+
+    .banner-heading {
+      font-size: 1.95rem;
+      line-height: 1.25;
+      font-weight: 700;
+      color: #FFFFFF;
+      margin-bottom: 12px;
+      font-family: 'Fredoka', cursive;
+      text-shadow: 0 2px 10px rgba(70, 10, 35, 0.3);
+    }
+
+    .banner-text {
+      font-size: 0.94rem;
+      color: #FFF2F6;
+      line-height: 1.65;
+      margin-bottom: 22px;
+      font-weight: 500;
+    }
+
+    /* Kartu Keunggulan Praktikum */
+    .banner-features-list {
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+      margin: 10px 0 24px 0;
+    }
+
+    .banner-feat-item {
+      background: rgba(255, 255, 255, 0.18);
+      backdrop-filter: blur(10px);
+      border: 1.5px solid rgba(255, 255, 255, 0.35);
+      border-radius: 16px;
+      padding: 12px 16px;
+      display: flex;
+      align-items: center;
+      gap: 14px;
+      box-shadow: 0 4px 14px rgba(70, 10, 35, 0.15);
+    }
+
+    .feat-dot-icon {
+      font-size: 1.35rem;
+      line-height: 1;
+      background: rgba(255, 255, 255, 0.95);
+      width: 36px;
+      height: 36px;
+      border-radius: 10px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      flex-shrink: 0;
+      box-shadow: 0 2px 6px rgba(0, 0, 0, 0.1);
+    }
+
+    .feat-text h4 {
+      font-size: 0.94rem;
+      font-weight: 700;
+      color: #FFFFFF;
+      margin-bottom: 2px;
+      font-family: 'Fredoka', cursive;
+    }
+
+    .feat-text p {
+      font-size: 0.8rem;
+      color: #FFF6F9;
+      line-height: 1.4;
+      margin: 0;
+      font-weight: 500;
+    }
+
+    .banner-quote {
+      font-size: 0.86rem;
+      color: #FFFDE6;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      font-weight: 700;
+      font-family: 'Fredoka', cursive;
+    }
+
+    /* SISI KANAN MODAL: FORMULIR BERSIH */
+    .modal-form-right {
+      flex: 1.15;
+      padding: 42px 38px;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      background: #FFFFFF;
+    }
+
+    .form-header-title {
+      font-size: 1.7rem;
+      font-weight: 700;
+      color: #38242B;
+      margin-bottom: 4px;
+      font-family: 'Fredoka', cursive;
+    }
+
+    .form-header-sub {
+      font-size: 0.9rem;
+      color: #8C757E;
+      margin-bottom: 22px;
+    }
+
+    /* Segmented Tab Pill */
+    .segmented-switch {
+      display: flex;
+      background: #FDF2F6;
+      border: 1.5px solid #F8DAE4;
+      border-radius: var(--radius-pill);
+      padding: 4px;
+      margin-bottom: 22px;
+    }
+
+    .switch-pill-btn {
+      flex: 1;
+      border: none;
+      background: transparent;
+      padding: 9px 0;
+      border-radius: var(--radius-pill);
+      font-size: 0.95rem;
+      font-weight: 700;
+      color: #8C757E;
+      cursor: pointer;
+      transition: all 0.2s ease;
+      font-family: 'Fredoka', cursive;
+    }
+
+    .switch-pill-btn.active {
+      background: #FFFFFF;
+      color: var(--pastel-pink-accent);
+      box-shadow: 0 3px 10px rgba(138, 31, 75, 0.2);
+    }
+
+    .form-pane {
+      display: none;
+    }
+
+    .form-pane.active {
+      display: block;
+    }
+
+    /* Form Fields */
+    .field-row {
+      margin-bottom: 16px;
+      text-align: left;
+    }
+
+    .field-row-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 6px;
+    }
+
+    .field-label {
+      font-size: 0.88rem;
+      font-weight: 700;
+      color: #4A343D;
+    }
+
+    .field-link {
+      font-size: 0.82rem;
+      color: var(--pastel-pink-accent);
+      text-decoration: none;
+      font-weight: 700;
+      cursor: pointer;
+    }
+
+    .field-link:hover {
+      text-decoration: underline;
+    }
+
+    .input-box-wrapper {
+      position: relative;
+      display: flex;
+      align-items: center;
+    }
+
+    .clean-input {
+      width: 100%;
+      padding: 12px 16px;
+      border: 1.5px solid var(--pastel-pink-border);
+      border-radius: var(--radius-sm);
+      font-size: 0.95rem;
+      font-family: 'Plus Jakarta Sans', sans-serif;
+      color: #2D141C;
+      outline: none;
+      transition: all 0.2s ease;
+      background: #FFFDFE;
+    }
+
+    .clean-input:focus {
+      border-color: var(--pastel-pink-accent);
+      box-shadow: 0 0 0 3px rgba(138, 31, 75, 0.18);
+      background: white;
+    }
+
+    .clean-input::placeholder {
+      color: #CDB6C0;
+    }
+
+    .input-eye-btn {
+      position: absolute;
+      right: 12px;
+      background: none;
+      border: none;
+      color: #B59BA4;
+      cursor: pointer;
+      font-size: 1.1rem;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      transition: color 0.2s ease;
+    }
+
+    .input-eye-btn:hover {
+      color: var(--pastel-pink-accent);
+    }
+
+    .remember-check-row {
+      display: flex;
+      align-items: center;
+      gap: 7px;
+      font-size: 0.86rem;
+      color: #725D65;
+      margin-bottom: 20px;
+      cursor: pointer;
+      font-weight: 500;
+    }
+
+    .remember-check-row input {
+      accent-color: var(--pastel-pink-accent);
+      width: 15px;
+      height: 15px;
+    }
+
+    /* Tombol Masuk/Daftar Deep Raspberry Rose (#8A1F4B) */
+    .btn-submit-cute {
+      width: 100%;
+      padding: 13px;
+      background: linear-gradient(135deg, #A12B5B, #8A1F4B);
+      color: white;
+      border: none;
+      border-radius: var(--radius-pill);
+      font-size: 1.02rem;
+      font-weight: 700;
+      font-family: 'Fredoka', cursive;
+      cursor: pointer;
+      box-shadow: 0 6px 18px rgba(138, 31, 75, 0.38);
+      transition: all 0.2s ease;
+    }
+
+    .btn-submit-cute:hover {
+      background: linear-gradient(135deg, #8A1F4B, #70163C);
+      transform: translateY(-1px);
+      box-shadow: 0 8px 22px rgba(138, 31, 75, 0.48);
+    }
+
+    .bottom-switch-link {
+      text-align: center;
+      font-size: 0.86rem;
+      color: #8C757E;
+      margin-top: 18px;
+    }
+
+    .bottom-switch-link a {
+      color: var(--pastel-pink-accent);
+      font-weight: 700;
+      text-decoration: none;
+      cursor: pointer;
+    }
+
+    .bottom-switch-link a:hover {
+      text-decoration: underline;
+    }
+
+    /* ================= RESPONSIVE ================= */
+    @media (max-width: 820px) {
+      .header-nav {
+        padding: 16px 24px;
+      }
+
+      .hero-title {
+        font-size: 2.5rem;
+      }
+
+      .features-strip {
+        grid-template-columns: 1fr;
+        max-width: 420px;
+      }
+
+      .modal-split-box {
+        flex-direction: column;
+        max-height: 90vh;
+        overflow-y: auto;
+      }
+
+      .modal-banner-left {
+        padding: 26px 22px;
+      }
+
+      .modal-form-right {
+        padding: 28px 22px;
+      }
+    }
+  </style>
+</head>
+<body>
+
+  <!-- ================= NAVBAR ================= -->
+  <header class="header-nav">
+    <a href="#" class="brand">
+      <div class="brand-icon">✨</div>
+      <div class="brand-text">MicroLearn<span class="brand-badge">PRO</span></div>
+    </a>
+
+    <div class="nav-actions">
+      <button class="btn-clean btn-login-nav" onclick="openModal('login')">Masuk</button>
+      <button class="btn-clean btn-register-nav" onclick="openModal('register')">Daftar Akun 🌸</button>
+    </div>
+  </header>
+
+  <!-- ================= MAIN HERO (TERPUSAT & BERSIH) ================= -->
+  <main class="hero-wrapper">
+    <div class="tag-pill">
+      <span class="badge-dot"></span>
+      <span>MODUL PRAKTIKUM MICROSERVICES & DOCKER 2026</span>
+    </div>
+
+    <h1 class="hero-title">
+      Implementasi Sistem & <span class="accent-pink">Arsitektur Microservices</span> <span class="accent-yellow-box">Modern.</span>
+    </h1>
+
+    <p class="hero-description">
+      Platform praktikum terpadu untuk mempelajari arsitektur terdistribusi, manajemen container Docker, dan routing API Gateway dengan antarmuka yang bersih, terstruktur, dan mudah dipahami.
+    </p>
+
+    <div class="hero-buttons">
+      <button class="btn-primary-hero" onclick="openModal('register')">
+        <span>Mulai Eksplorasi Sistem</span>
+        <span>🚀</span>
+      </button>
+      <button class="btn-secondary-hero" onclick="openModal('login')">
+        <span>Dokumentasi Layanan</span>
+        <span>📑</span>
+      </button>
+    </div>
+
+    <!-- 3 Kartu Fitur Ringkas & Rapi -->
+    <div class="features-strip">
+      <div class="feature-item-card">
+        <div class="feature-icon-box icon-pink">🐋</div>
+        <div class="feature-text-group">
+          <h3>Docker Container</h3>
+          <p>Layanan modular terisolasi & siap deploy</p>
+        </div>
+      </div>
+
+      <div class="feature-item-card">
+        <div class="feature-icon-box icon-yellow">🌐</div>
+        <div class="feature-text-group">
+          <h3>API Gateway</h3>
+          <p>Routing endpoint & proxy terintegrasi</p>
+        </div>
+      </div>
+
+      <div class="feature-item-card">
+        <div class="feature-icon-box icon-mint">⚡</div>
+        <div class="feature-text-group">
+          <h3>Sistem Terdistribusi</h3>
+          <p>Komunikasi antar service yang independen</p>
+        </div>
+      </div>
+    </div>
+  </main>
+
+  <!-- ================= POPUP MODAL SPLIT CARD (DEEP RASPBERRY ROSE #8A1F4B) ================= -->
+  <div class="modal-backdrop" id="authModal" onclick="handleBackdropClick(event)">
+    <div class="modal-split-box">
+      <!-- Tombol Tutup Silang Imut (✕) -->
+      <button class="modal-close-cross" onclick="closeModal()" title="Tutup">✕</button>
+
+      <!-- SISI KIRI: LATAR WARNA DEEP RASPBERRY ROSE (#8A1F4B), TEKS PUTIH TERANG & KONTRAS -->
+      <div class="modal-banner-left">
+        <div>
+          <div class="banner-top-brand">
+            <span class="banner-brand-icon">🌸</span>
+            <span>Velisa • MicroLearn Lab</span>
+          </div>
+
+          <h2 class="banner-heading">Belajar Arsitektur Jadi Menyenangkan! ✨</h2>
+          <p class="banner-text">
+            Akses modul praktikum, orkestrasi container Docker, dan bangun pemahaman sistem terdistribusi dengan cara yang ceria dan terstruktur.
+          </p>
+        </div>
+
+        <!-- KEUNGGULAN MODUL PRAKTIKUM -->
+        <div class="banner-features-list">
+          <div class="banner-feat-item">
+            <span class="feat-dot-icon">🌸</span>
+            <div class="feat-text">
+              <h4>100% Ramah Pemula</h4>
+              <p>Materi arsitektur & Docker dipelajari langkah demi langkah.</p>
+            </div>
+          </div>
+
+          <div class="banner-feat-item">
+            <span class="feat-dot-icon">⚡</span>
+            <div class="feat-text">
+              <h4>Praktikum Interaktif</h4>
+              <p>Konfigurasi API Gateway & container secara terstruktur.</p>
+            </div>
+          </div>
+
+          <div class="banner-feat-item">
+            <span class="feat-dot-icon">✨</span>
+            <div class="feat-text">
+              <h4>Ruang Belajar Ceria</h4>
+              <p>Lingkungan belajar yang hangat dan menyenangkan.</p>
+            </div>
+          </div>
+        </div>
+
+        <div class="banner-quote">
+          <span>💖</span>
+          <span>"Langkah kecil hari ini untuk arsitektur hebat esok hari."</span>
+        </div>
+      </div>
+
+      <!-- SISI KANAN: FORMULIR DENGAN SENTUHAN DEEP RASPBERRY ROSE (#8A1F4B) -->
+      <div class="modal-form-right">
+        <h2 class="form-header-title" id="formMainTitle">Halo Sahabat Manis! 👋</h2>
+        <p class="form-header-sub" id="formSubTitle">Silakan masuk ke akun praktikum kamu yaa</p>
+
+        <!-- Segmented Tab Switcher (Masuk & Daftar) -->
+        <div class="segmented-switch">
+          <button class="switch-pill-btn active" id="tabMasukBtn" onclick="switchModalTab('login')">🐥 Masuk</button>
+          <button class="switch-pill-btn" id="tabDaftarBtn" onclick="switchModalTab('register')">🌸 Daftar</button>
+        </div>
+
+        <!-- FORMULIR MASUK / LOGIN -->
+        <div class="form-pane active" id="paneLogin">
+          <form onsubmit="handleAuthSubmit(event, 'Masuk')">
+            <div class="field-row">
+              <label class="field-label" for="loginEmail">Email Kamu</label>
+              <div class="input-box-wrapper" style="margin-top: 6px;">
+                <input type="email" id="loginEmail" class="clean-input" placeholder="kamu@email.com" required>
+              </div>
+            </div>
+
+            <div class="field-row">
+              <div class="field-row-header">
+                <label class="field-label" for="loginPass">Kata Sandi</label>
+                <a href="javascript:void(0)" class="field-link" onclick="alert('Instruksi pemulihan kata sandi telah dikirim ke email kamu!')">Lupa sandi? 🥺</a>
+              </div>
+              <div class="input-box-wrapper">
+                <input type="password" id="loginPass" class="clean-input" placeholder="Masukkan kata sandi..." required>
+                <button type="button" class="input-eye-btn" onclick="togglePasswordVisibility('loginPass', this)" title="Lihat kata sandi">👁</button>
+              </div>
+            </div>
+
+            <label class="remember-check-row">
+              <input type="checkbox" id="rememberMe">
+              <span>Ingat aku ya! 🧸</span>
+            </label>
+
+            <button type="submit" class="btn-submit-cute">Masuk Sekarang ✨</button>
+
+            <p class="bottom-switch-link">
+              Belum punya akun? <a onclick="switchModalTab('register')">Daftar sekarang 🌸</a>
+            </p>
+          </form>
+        </div>
+
+        <!-- FORMULIR DAFTAR / REGISTRASI -->
+        <div class="form-pane" id="paneRegister">
+          <form onsubmit="handleAuthSubmit(event, 'Mendaftar')">
+            <div class="field-row">
+              <label class="field-label" for="regName">Nama Lengkap</label>
+              <div class="input-box-wrapper" style="margin-top: 6px;">
+                <input type="text" id="regName" class="clean-input" placeholder="Nama lengkap kamu" required>
+              </div>
+            </div>
+
+            <div class="field-row">
+              <label class="field-label" for="regEmail">Alamat Email</label>
+              <div class="input-box-wrapper" style="margin-top: 6px;">
+                <input type="email" id="regEmail" class="clean-input" placeholder="nama@email.com" required>
+              </div>
+            </div>
+
+            <div class="field-row">
+              <label class="field-label" for="regPass">Kata Sandi Baru</label>
+              <div class="input-box-wrapper" style="margin-top: 6px;">
+                <input type="password" id="regPass" class="clean-input" placeholder="Minimal 8 karakter manis..." required>
+                <button type="button" class="input-eye-btn" onclick="togglePasswordVisibility('regPass', this)" title="Lihat kata sandi">👁</button>
+              </div>
+            </div>
+
+            <label class="remember-check-row">
+              <input type="checkbox" required checked>
+              <span>Saya siap menjadi sahabat belajar yang ceria! 🌸</span>
+            </label>
+
+            <button type="submit" class="btn-submit-cute">Daftar Akun Baru 💖</button>
+
+            <p class="bottom-switch-link">
+              Sudah punya akun? <a onclick="switchModalTab('login')">Masuk di sini ✨</a>
+            </p>
+          </form>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ================= JAVASCRIPT LOGIC ================= -->
+  <script>
+    const authModal = document.getElementById('authModal');
+    const tabMasukBtn = document.getElementById('tabMasukBtn');
+    const tabDaftarBtn = document.getElementById('tabDaftarBtn');
+    const paneLogin = document.getElementById('paneLogin');
+    const paneRegister = document.getElementById('paneRegister');
+    const formMainTitle = document.getElementById('formMainTitle');
+    const formSubTitle = document.getElementById('formSubTitle');
+
+    // Buka Modal
+    function openModal(mode = 'login') {
+      authModal.classList.add('active');
+      switchModalTab(mode);
+    }
+
+    // Tutup Modal
+    function closeModal() {
+      authModal.classList.remove('active');
+    }
+
+    // Tutup jika klik area latar luar modal
+    function handleBackdropClick(event) {
+      if (event.target === authModal) {
+        closeModal();
+      }
+    }
+
+    // Tutup dengan keyboard ESC
+    document.addEventListener('keydown', (e) => {
+      if (e.key === 'Escape' && authModal.classList.contains('active')) {
+        closeModal();
+      }
+    });
+
+    // Pindah Tab Masuk / Daftar
+    function switchModalTab(mode) {
+      if (mode === 'login') {
+        tabMasukBtn.classList.add('active');
+        tabDaftarBtn.classList.remove('active');
+        paneLogin.classList.add('active');
+        paneRegister.classList.remove('active');
+        formMainTitle.textContent = 'Halo Sahabat Manis! 👋';
+        formSubTitle.textContent = 'Silakan masuk ke akun praktikum kamu yaa';
+      } else {
+        tabDaftarBtn.classList.add('active');
+        tabMasukBtn.classList.remove('active');
+        paneRegister.classList.add('active');
+        paneLogin.classList.remove('active');
+        formMainTitle.textContent = 'Yuk Gabung Belajar! 🌸';
+        formSubTitle.textContent = 'Lengkapi data untuk memulai praktikum ceriamu';
+      }
+    }
+
+    // Fitur Toggle Lihat / Sembunyikan Password (Icon Mata 👁)
+    function togglePasswordVisibility(inputId, btn) {
+      const input = document.getElementById(inputId);
+      if (input.type === 'password') {
+        input.type = 'text';
+        btn.textContent = '🙈';
+        btn.title = 'Sembunyikan kata sandi';
+      } else {
+        input.type = 'password';
+        btn.textContent = '👁';
+        btn.title = 'Lihat kata sandi';
+      }
+    }
+
+    // Handle Submit
+    function handleAuthSubmit(event, action) {
+      event.preventDefault();
+      alert(`Berhasil ${action}! Selamat belajar di Velisa MicroLearn Lab 💕`);
+      closeModal();
+      event.target.reset();
+    }
+  </script>
+</body>
+</html>
